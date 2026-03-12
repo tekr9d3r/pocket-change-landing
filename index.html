@@ -7,6 +7,10 @@
   <meta name="description" content="Finds idle ETH in agent wallets. Stakes it through Lido. Charges 0.25%. You keep the rest." />
   <meta property="og:title" content="PocketChange AI Agent — Ethereum Yield Agent" />
   <meta property="og:description" content="Finds idle ETH in agent wallets. Stakes it through Lido. Charges 0.25%. You keep the rest." />
+  <link rel="icon" href="/public/images/favicon.ico" />
+  <meta property="og:image" content="/public/images/website-preview.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -56,11 +60,15 @@
     }
 
     .nav-brand {
-      font-family: var(--mono);
-      font-size: 14px;
-      color: var(--accent);
       text-decoration: none;
-      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo {
+      height: 28px;
+      width: auto;
+      display: block;
     }
 
     .nav-links {
@@ -296,89 +304,45 @@
       margin-bottom: 32px;
     }
 
-    /* ── Fee feed ── */
-    #fees .fee-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .fee-status {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .fee-status .dot {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      margin-right: 6px;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .fee-table {
+    /* ── Transparency ── */
+    .treasury-box {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 8px;
-      overflow: hidden;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
-    .fee-table-header {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      padding: 10px 16px;
-      background: #161616;
-      border-bottom: 1px solid var(--border);
-      font-family: var(--mono);
-      font-size: 11px;
+    .treasury-info p {
+      font-size: 14px;
       color: var(--muted);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      line-height: 1.6;
+      max-width: 440px;
     }
 
-    .fee-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      padding: 11px 16px;
-      border-bottom: 1px solid var(--border);
+    .treasury-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-family: var(--mono);
       font-size: 13px;
-      transition: background 0.15s;
-    }
-
-    .fee-row:last-child { border-bottom: none; }
-    .fee-row:hover { background: rgba(255,255,255,0.02); }
-
-    .fee-row a {
       color: var(--accent);
       text-decoration: none;
+      border: 1px solid rgba(59, 158, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: border-color 0.15s, background 0.15s;
     }
 
-    .fee-row a:hover { text-decoration: underline; }
-
-    .fee-amount { color: #fff; }
-    .fee-time { color: var(--muted); font-size: 12px; }
-
-    #fee-loading, #fee-empty, #fee-error {
-      padding: 32px 16px;
-      text-align: center;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--muted);
+    .treasury-link:hover {
+      border-color: var(--accent);
+      background: rgba(59, 158, 255, 0.06);
     }
-
-    #fee-error a { color: var(--accent); }
 
     /* ── Footer ── */
     footer {
@@ -455,7 +419,9 @@
 <!-- ── Nav ── -->
 <nav>
   <div class="nav-inner">
-    <a class="nav-brand" href="#hero">PocketChange AI Agent</a>
+    <a class="nav-brand" href="#hero">
+      <img src="/public/images/logo-pcaa.png" alt="PocketChange AI Agent" class="nav-logo" />
+    </a>
     <ul class="nav-links">
       <li><a href="#why" data-section="why">Why</a></li>
       <li><a href="#how" data-section="how">How it works</a></li>
@@ -551,24 +517,18 @@
 </section>
 
 
-<!-- ── Live fee feed ── -->
+<!-- ── Transparency ── -->
 <section id="fees">
   <div class="container">
-    <div class="section-label">// live fee transparency</div>
-    <div class="fee-header">
-      <h2 style="margin-bottom:0">Recent fees collected</h2>
-      <div class="fee-status"><span class="dot"></span><span id="feed-status">Loading…</span></div>
-    </div>
-
-    <div class="fee-table">
-      <div class="fee-table-header">
-        <span>Transaction</span>
-        <span>Amount (ETH)</span>
-        <span>When</span>
+    <div class="section-label">// transparency</div>
+    <h2>Fees are on-chain. Always.</h2>
+    <div class="treasury-box">
+      <div class="treasury-info">
+        <p>Every fee collected by PocketChange AI Agent goes directly to a public treasury wallet. No hidden wallets, no off-chain routing. You can verify every transaction independently on Etherscan.</p>
       </div>
-      <div id="fee-rows">
-        <div id="fee-loading">Fetching transactions…</div>
-      </div>
+      <a class="treasury-link" href="https://etherscan.io/address/0xFCcA38986b2B30D14CE829b20ed7B0Cb1c6E0116" target="_blank" rel="noopener">
+        View treasury on Etherscan →
+      </a>
     </div>
   </div>
 </section>
@@ -593,9 +553,6 @@
 </footer>
 
 <script>
-  const TREASURY = '0xFCcA38986b2B30D14CE829b20ed7B0Cb1c6E0116';
-  const ETHERSCAN_URL = `https://api.etherscan.io/api?module=account&action=txlist&address=${TREASURY}&sort=desc&page=1&offset=10`;
-
   // ── Copy buttons ──
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -624,63 +581,6 @@
       }
     });
   });
-
-  // ── Time ago helper ──
-  function timeAgo(unixTs) {
-    const secs = Math.floor(Date.now() / 1000) - parseInt(unixTs);
-    if (secs < 60) return `${secs}s ago`;
-    if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
-    if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
-    return `${Math.floor(secs / 86400)}d ago`;
-  }
-
-  // ── Fee feed ──
-  function renderFees(txs) {
-    const container = document.getElementById('fee-rows');
-    const inbound = txs.filter(tx =>
-      tx.to && tx.to.toLowerCase() === TREASURY.toLowerCase() &&
-      tx.txreceipt_status === '1' &&
-      BigInt(tx.value) > 0n
-    );
-
-    if (inbound.length === 0) {
-      container.innerHTML = `<div id="fee-empty">No fee transactions found yet. <a href="https://etherscan.io/address/${TREASURY}" target="_blank" rel="noopener" style="color:var(--accent)">View on Etherscan →</a></div>`;
-      return;
-    }
-
-    container.innerHTML = inbound.map(tx => {
-      const eth = (Number(BigInt(tx.value)) / 1e18).toFixed(6);
-      const hash = tx.hash;
-      const short = hash.slice(0, 6) + '…' + hash.slice(-4);
-      return `<div class="fee-row">
-        <a href="https://etherscan.io/tx/${hash}" target="_blank" rel="noopener">${short}</a>
-        <span class="fee-amount">${eth} ETH</span>
-        <span class="fee-time">${timeAgo(tx.timeStamp)}</span>
-      </div>`;
-    }).join('');
-  }
-
-  function loadFees() {
-    const status = document.getElementById('feed-status');
-    fetch(ETHERSCAN_URL)
-      .then(r => r.json())
-      .then(data => {
-        if (data.status === '1' && Array.isArray(data.result)) {
-          renderFees(data.result);
-          status.textContent = `Updated ${new Date().toLocaleTimeString()}`;
-        } else {
-          throw new Error('API returned no results');
-        }
-      })
-      .catch(() => {
-        document.getElementById('fee-rows').innerHTML =
-          `<div id="fee-error">Could not load transactions. <a href="https://etherscan.io/address/${TREASURY}" target="_blank" rel="noopener">View on Etherscan →</a></div>`;
-        status.textContent = 'Feed unavailable';
-      });
-  }
-
-  loadFees();
-  setInterval(loadFees, 60000);
 
   // ── Nav active section via IntersectionObserver ──
   const sections = document.querySelectorAll('section[id]');
