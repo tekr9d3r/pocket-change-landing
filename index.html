@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PocketChange AI Agent — Ethereum Yield Agent</title>
+  <meta name="description" content="Finds idle ETH in agent wallets. Stakes it through Lido. Charges 0.25%. You keep the rest." />
+  <meta property="og:title" content="PocketChange AI Agent — Ethereum Yield Agent" />
+  <meta property="og:description" content="Finds idle ETH in agent wallets. Stakes it through Lido. Charges 0.25%. You keep the rest." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --accent: #3b9eff;
+      --accent-dim: rgba(59, 158, 255, 0.12);
+      --text: #e8e8e8;
+      --muted: #666;
+      --mono: ui-monospace, 'Cascadia Code', 'Fira Code', Menlo, monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+
+    .nav-brand {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--text); }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 72px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    /* ── Hero ── */
+    #hero { padding: 80px 0 72px; }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 3px 10px;
+      border-radius: 3px;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(42px, 8vw, 64px);
+      font-weight: 600;
+      letter-spacing: -2px;
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .tagline {
+      font-size: 18px;
+      color: #aaa;
+      max-width: 520px;
+      line-height: 1.5;
+      margin-bottom: 36px;
+    }
+
+    .hero-curl {
+      background: #0d1520;
+      border: 1px solid rgba(59, 158, 255, 0.35);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 0 24px rgba(59, 158, 255, 0.08);
+    }
+
+    .curl-bar {
+      background: #0f1c2e;
+      border-bottom: 1px solid rgba(59, 158, 255, 0.2);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .curl-bar span {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .curl-body {
+      padding: 14px 16px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #ccc;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+
+    .meta-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .meta-item span { color: var(--accent); }
+
+    .activate-label {
+      font-size: 15px;
+      color: #bbb;
+      margin-bottom: 12px;
+      letter-spacing: 0.01em;
+    }
+
+    .activate-hint {
+      font-size: 14px;
+      color: #888;
+      max-width: 520px;
+      line-height: 1.6;
+      margin-top: 12px;
+      margin-bottom: 28px;
+    }
+
+    /* ── Why cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: #333; }
+
+    .card-icon {
+      font-size: 20px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── How it works ── */
+    .steps {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .step-arrow {
+      padding-top: 18px;
+      color: #333;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      color: #fff;
+      margin-bottom: 32px;
+    }
+
+    /* ── Fee feed ── */
+    #fees .fee-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .fee-status {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .fee-status .dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .fee-table {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .fee-table-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      padding: 10px 16px;
+      background: #161616;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .fee-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 13px;
+      transition: background 0.15s;
+    }
+
+    .fee-row:last-child { border-bottom: none; }
+    .fee-row:hover { background: rgba(255,255,255,0.02); }
+
+    .fee-row a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .fee-row a:hover { text-decoration: underline; }
+
+    .fee-amount { color: #fff; }
+    .fee-time { color: var(--muted); font-size: 12px; }
+
+    #fee-loading, #fee-empty, #fee-error {
+      padding: 32px 16px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    #fee-error a { color: var(--accent); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-brand {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-treasury {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .footer-treasury a { color: var(--muted); text-decoration: none; }
+    .footer-treasury a:hover { color: var(--accent); }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      section { padding: 48px 0; }
+      #hero { padding: 56px 0 48px; }
+
+      .cards { grid-template-columns: 1fr; }
+
+      .steps { flex-direction: column; gap: 24px; }
+      .step { text-align: left; }
+      .step-arrow { display: none; }
+
+      h2 { font-size: 22px; margin-bottom: 24px; }
+
+      .fee-table-header,
+      .fee-row { grid-template-columns: 1fr 1fr; }
+      .fee-time { display: none; }
+
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="#hero">PocketChange AI Agent</a>
+    <ul class="nav-links">
+      <li><a href="#why" data-section="why">Why</a></li>
+      <li><a href="#how" data-section="how">How it works</a></li>
+      <li><a href="#fees" data-section="fees">Live fees</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section id="hero">
+  <div class="container">
+    <div class="badge">AI Agent // Ethereum</div>
+    <h1>PocketChange AI Agent</h1>
+    <p class="tagline">Most agent wallets sit idle. Every quiet wallet is yield you're leaving on the table.</p>
+
+    <p class="activate-hint" style="margin-top:0; margin-bottom:32px;">
+      Agents running multiple wallets often hold small ETH balances that never move — operational reserves, dust, unused float. PocketChange AI Agent finds those wallets, checks if they're active, and stakes what's safe through Lido at ~3.5% APY. It only stakes what makes sense: inactive wallets, above the dust threshold, when gas won't eat the return. You keep the yield. We take 0.25%.
+    </p>
+
+    <p class="activate-label">Give this to your agent to get started:</p>
+
+    <div class="hero-curl">
+      <div class="curl-bar">
+        <span>skill.md — paste into your agent or run in terminal</span>
+        <button class="copy-btn" data-target="hero-code">Copy</button>
+      </div>
+      <div class="curl-body" id="hero-code">curl -s https://pocket-change-agent.vercel.app/skill.md</div>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-item"><span>0.25%</span> fee</div>
+      <div class="meta-item"><span>~3.5% APY</span> via Lido</div>
+      <div class="meta-item"><span>requires_signature:</span> true</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Why ── -->
+<section id="why">
+  <div class="container">
+    <div class="section-label">// why use this agent</div>
+    <h2>Built for agent operators</h2>
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">⚡</span>
+        <h3>Works 24/7</h3>
+        <p>Register once. Wallets are re-analyzed every 24h via cron. No babysitting required.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔒</span>
+        <h3>Never touches your keys</h3>
+        <p><code style="font-family:var(--mono);font-size:12px;color:var(--accent)">requires_signature: true</code> always. Instructions only — you sign and execute.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⛽</span>
+        <h3>Gas-aware</h3>
+        <p>If gas exceeds 15% of balance, PocketChange AI Agent waits. Protects you from bad economics.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📈</span>
+        <h3>stETH yield</h3>
+        <p>Stakes via Lido at ~3.5% APY. Always preserves a $3 gas reserve — never stakes dust.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ── -->
+<section id="how">
+  <div class="container">
+    <div class="section-label">// how it works</div>
+    <h2>Three steps, zero custody</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Register</div>
+        <div class="step-desc">POST your wallet addresses and agent ID. One-time setup.</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Analyze</div>
+        <div class="step-desc">PocketChange AI Agent fetches balances, gas prices, and Lido APY. Reasons about timing.</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Earn</div>
+        <div class="step-desc">Receive signed-ready staking instructions. Execute when ready. Collect stETH yield.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── Live fee feed ── -->
+<section id="fees">
+  <div class="container">
+    <div class="section-label">// live fee transparency</div>
+    <div class="fee-header">
+      <h2 style="margin-bottom:0">Recent fees collected</h2>
+      <div class="fee-status"><span class="dot"></span><span id="feed-status">Loading…</span></div>
+    </div>
+
+    <div class="fee-table">
+      <div class="fee-table-header">
+        <span>Transaction</span>
+        <span>Amount (ETH)</span>
+        <span>When</span>
+      </div>
+      <div id="fee-rows">
+        <div id="fee-loading">Fetching transactions…</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">PocketChange AI Agent</div>
+    <div class="footer-links">
+      <a href="https://x.com/tekr0x" target="_blank" rel="noopener">X</a>
+      <a href="https://farcaster.xyz/tekrox.eth" target="_blank" rel="noopener">Farcaster</a>
+      <a href="https://github.com/tekr9d3r" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://pocket-change-agent.vercel.app/skill.md" target="_blank" rel="noopener">skill.md</a>
+      <div class="footer-treasury">
+        treasury:
+        <a href="https://etherscan.io/address/0xFCcA38986b2B30D14CE829b20ed7B0Cb1c6E0116" target="_blank" rel="noopener">
+          0xFCcA…E0116
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const TREASURY = '0xFCcA38986b2B30D14CE829b20ed7B0Cb1c6E0116';
+  const ETHERSCAN_URL = `https://api.etherscan.io/api?module=account&action=txlist&address=${TREASURY}&sort=desc&page=1&offset=10`;
+
+  // ── Copy buttons ──
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      const text = target.textContent;
+      const restore = () => { btn.textContent = 'Copy'; btn.classList.remove('copied'); };
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(restore, 2000);
+        });
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(restore, 2000);
+      }
+    });
+  });
+
+  // ── Time ago helper ──
+  function timeAgo(unixTs) {
+    const secs = Math.floor(Date.now() / 1000) - parseInt(unixTs);
+    if (secs < 60) return `${secs}s ago`;
+    if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+    if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+    return `${Math.floor(secs / 86400)}d ago`;
+  }
+
+  // ── Fee feed ──
+  function renderFees(txs) {
+    const container = document.getElementById('fee-rows');
+    const inbound = txs.filter(tx =>
+      tx.to && tx.to.toLowerCase() === TREASURY.toLowerCase() &&
+      tx.txreceipt_status === '1' &&
+      BigInt(tx.value) > 0n
+    );
+
+    if (inbound.length === 0) {
+      container.innerHTML = `<div id="fee-empty">No fee transactions found yet. <a href="https://etherscan.io/address/${TREASURY}" target="_blank" rel="noopener" style="color:var(--accent)">View on Etherscan →</a></div>`;
+      return;
+    }
+
+    container.innerHTML = inbound.map(tx => {
+      const eth = (Number(BigInt(tx.value)) / 1e18).toFixed(6);
+      const hash = tx.hash;
+      const short = hash.slice(0, 6) + '…' + hash.slice(-4);
+      return `<div class="fee-row">
+        <a href="https://etherscan.io/tx/${hash}" target="_blank" rel="noopener">${short}</a>
+        <span class="fee-amount">${eth} ETH</span>
+        <span class="fee-time">${timeAgo(tx.timeStamp)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function loadFees() {
+    const status = document.getElementById('feed-status');
+    fetch(ETHERSCAN_URL)
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === '1' && Array.isArray(data.result)) {
+          renderFees(data.result);
+          status.textContent = `Updated ${new Date().toLocaleTimeString()}`;
+        } else {
+          throw new Error('API returned no results');
+        }
+      })
+      .catch(() => {
+        document.getElementById('fee-rows').innerHTML =
+          `<div id="fee-error">Could not load transactions. <a href="https://etherscan.io/address/${TREASURY}" target="_blank" rel="noopener">View on Etherscan →</a></div>`;
+        status.textContent = 'Feed unavailable';
+      });
+  }
+
+  loadFees();
+  setInterval(loadFees, 60000);
+
+  // ── Nav active section via IntersectionObserver ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a[data-section]');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => {
+          a.classList.toggle('active', a.dataset.section === entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
