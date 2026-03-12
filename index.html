@@ -210,6 +210,51 @@
       margin-bottom: 28px;
     }
 
+    /* ── Stats ── */
+    .stats-section {
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .stat {
+      padding: 8px 24px;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat:first-child { padding-left: 0; }
+    .stat:last-child { border-right: none; }
+
+    .stat-num {
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-num span { color: var(--accent); }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+      max-width: 180px;
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; gap: 28px; }
+      .stat { border-right: none; padding-left: 0; border-bottom: 1px solid var(--border); padding-bottom: 28px; }
+      .stat:last-child { border-bottom: none; padding-bottom: 0; }
+    }
+
     /* ── Why cards ── */
     .cards {
       display: grid;
@@ -435,10 +480,10 @@
   <div class="container">
     <div class="badge">AI Agent // Ethereum</div>
     <h1>PocketChange AI Agent</h1>
-    <p class="tagline">Most agent wallets sit idle. Every quiet wallet is yield you're leaving on the table.</p>
+    <p class="tagline">50,000 AI agents have wallets today. In a year, that number hits a million. Almost none of that ETH is working.</p>
 
     <p class="activate-hint" style="margin-top:0; margin-bottom:32px;">
-      Agents running multiple wallets often hold small ETH balances that never move — operational reserves, dust, unused float. PocketChange AI Agent finds those wallets, checks if they're active, and stakes what's safe through Lido at ~3.5% APY. It only stakes what makes sense: inactive wallets, above the dust threshold, when gas won't eat the return. You keep the yield. We take 0.25%.
+      Every on-chain agent holds ETH — for gas, for operations, for liquidity. Most of it sits idle 24/7. PocketChange AI Agent identifies which wallets are inactive, skips the ones that aren't safe to touch, and stakes the rest through Lido at ~3.5% APY. You keep the yield. We take 0.25%.
     </p>
 
     <p class="activate-label">Give this to your agent to get started:</p>
@@ -458,6 +503,26 @@
     </div>
   </div>
 </section>
+
+<!-- ── Stats ── -->
+<div class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-num">50<span>k+</span></div>
+        <div class="stat-label">on-chain AI agents with wallets today</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1<span>M+</span></div>
+        <div class="stat-label">projected agents within 12 months</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">~<span>3.5%</span></div>
+        <div class="stat-label">APY your idle ETH could be earning right now</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── Why ── -->
 <section id="why">
