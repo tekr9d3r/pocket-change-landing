@@ -349,6 +349,74 @@
       margin-bottom: 32px;
     }
 
+    /* ── Fee cards ── */
+    .fee-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 0;
+    }
+
+    .fee-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .fee-card-highlight {
+      border-color: rgba(59, 158, 255, 0.35);
+      background: #0d1520;
+    }
+
+    .fee-card-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fee-badge {
+      background: rgba(59, 158, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(59, 158, 255, 0.3);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .fee-card-price {
+      font-size: 40px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .fee-card-price span {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .fee-card-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .fee-cards { grid-template-columns: 1fr; }
+    }
+
     /* ── Transparency ── */
     .treasury-box {
       background: var(--surface);
@@ -470,7 +538,7 @@
     <ul class="nav-links">
       <li><a href="#why" data-section="why">Why</a></li>
       <li><a href="#how" data-section="how">How it works</a></li>
-      <li><a href="#fees" data-section="fees">Live fees</a></li>
+      <li><a href="#fees" data-section="fees">Fees</a></li>
     </ul>
   </div>
 </nav>
@@ -497,7 +565,7 @@
     </div>
 
     <div class="meta-row">
-      <div class="meta-item"><span>0.25%</span> fee</div>
+      <div class="meta-item"><span>0.25%</span> fee — or <span>$0.10 USDC</span> flat via x402</div>
       <div class="meta-item"><span>~3.5% APY</span> via Lido</div>
       <div class="meta-item"><span>requires_signature:</span> true</div>
     </div>
@@ -582,14 +650,28 @@
 </section>
 
 
-<!-- ── Transparency ── -->
+<!-- ── Fees & Transparency ── -->
 <section id="fees">
   <div class="container">
-    <div class="section-label">// transparency</div>
-    <h2>Fees are on-chain. Always.</h2>
-    <div class="treasury-box">
+    <div class="section-label">// fees &amp; transparency</div>
+    <h2>Two ways to pay. Both on-chain.</h2>
+
+    <div class="fee-cards">
+      <div class="fee-card">
+        <div class="fee-card-label">Default</div>
+        <div class="fee-card-price">0.25<span>%</span></div>
+        <div class="fee-card-desc">of staked ETH, deducted from the deposit. No upfront cost — you only pay when you earn.</div>
+      </div>
+      <div class="fee-card fee-card-highlight">
+        <div class="fee-card-label">x402 <span class="fee-badge">agent-native</span></div>
+        <div class="fee-card-price">$0.10<span> USDC</span></div>
+        <div class="fee-card-desc">flat fee per call, paid via <code style="font-family:var(--mono);font-size:12px;color:var(--accent)">X-PAYMENT</code> header in USDC on Base. ETH fee is waived — execution goes directly to Lido. Better for high-frequency callers.</div>
+      </div>
+    </div>
+
+    <div class="treasury-box" style="margin-top:24px;">
       <div class="treasury-info">
-        <p>Every fee collected by PocketChange AI Agent goes directly to a public treasury wallet. No hidden wallets, no off-chain routing. You can verify every transaction independently on Etherscan.</p>
+        <p>Every fee goes directly to a public treasury wallet. No hidden routing. Verify every transaction on Etherscan.</p>
       </div>
       <a class="treasury-link" href="https://etherscan.io/address/0xFCcA38986b2B30D14CE829b20ed7B0Cb1c6E0116" target="_blank" rel="noopener">
         View treasury on Etherscan →
